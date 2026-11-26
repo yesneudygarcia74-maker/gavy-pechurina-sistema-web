@@ -35,13 +35,13 @@
 </script>
 
 <svelte:head>
-	<title>Acceso de clientes | Gavy Pechurina</title>
+	<title>Acceso de proveedores | Gavy Pechurina</title>
 </svelte:head>
 
 <div class="pagina">
 	<form onsubmit={(e) => { e.preventDefault(); iniciarSesion(); }}>
 		<h1>Gavy Pechurina</h1>
-		<p>Acceso para clientes</p>
+		<p>Acceso para proveedores</p>
 
 		<label>Correo electrónico</label>
 		<input type="email" bind:value={email} placeholder="Tu correo" required />
@@ -58,7 +58,7 @@
 		</button>
 
 		<p class="registro">
-			¿No tienes cuenta? <a href="/extranet/registro">Regístrate</a>
+			¿Eres nuevo proveedor? <a href="/extranet/registro">Solicita tu registro</a>
 		</p>
 	</form>
 </div>
@@ -116,6 +116,11 @@
 		border-radius: 8px;
 		font-weight: bold;
 		cursor: pointer;
+	}
+
+	button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.error {
