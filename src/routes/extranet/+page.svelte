@@ -23,39 +23,43 @@
 </script>
 
 <svelte:head>
-	<title>Extranet | Gavy Pechurina</title>
+	<title>Panel de proveedores | Gavy Pechurina</title>
 </svelte:head>
 
 <div class="pagina">
 	<header>
-		<h1>Gavy Pechurina</h1>
+		<div>
+			<h1>Gavy Pechurina</h1>
+			<span>Portal de proveedores</span>
+		</div>
+
 		<button onclick={cerrarSesion} disabled={cerrando}>
 			{cerrando ? 'Cerrando...' : 'Cerrar sesión'}
 		</button>
 	</header>
 
 	<section class="bienvenida">
-		<h2>Bienvenido a nuestra Extranet</h2>
-		<p>Realiza tus pedidos y consulta tus compras.</p>
+		<h2>Bienvenido al portal de proveedores</h2>
+		<p>Gestiona tus entregas y consulta la información relacionada con tus suministros.</p>
 	</section>
 
 	<div class="opciones">
 		<a href="/extranet/productos">
-			<span>🛍️</span>
-			<h3>Consultar productos</h3>
-			<p>Explora nuestros productos disponibles.</p>
+			<span>📦</span>
+			<h3>Productos suministrados</h3>
+			<p>Consulta los productos relacionados con tus suministros.</p>
 		</a>
 
 		<a href="/extranet/pedidos">
-			<span>🛒</span>
-			<h3>Realizar pedidos</h3>
-			<p>Selecciona tus productos y realiza tu pedido.</p>
+			<span>🚚</span>
+			<h3>Entregas asignadas</h3>
+			<p>Consulta las entregas que te han sido asignadas.</p>
 		</a>
 
 		<a href="/extranet/historial">
 			<span>📋</span>
-			<h3>Mis pedidos</h3>
-			<p>Consulta el historial y estado de tus pedidos.</p>
+			<h3>Historial de entregas</h3>
+			<p>Consulta el registro y estado de tus entregas anteriores.</p>
 		</a>
 	</div>
 </div>
@@ -78,6 +82,11 @@
 
 	header h1 {
 		color: #e87520;
+		margin-bottom: 5px;
+	}
+
+	header span {
+		color: #777;
 	}
 
 	button {
@@ -89,6 +98,11 @@
 		cursor: pointer;
 	}
 
+	button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
 	.bienvenida {
 		text-align: center;
 		padding: 45px 10px;
@@ -96,6 +110,10 @@
 
 	.bienvenida h2 {
 		color: #333;
+	}
+
+	.bienvenida p {
+		color: #777;
 	}
 
 	.opciones {
@@ -113,6 +131,7 @@
 		text-decoration: none;
 		color: #333;
 		box-shadow: 0 5px 20px #00000010;
+		transition: transform 0.2s;
 	}
 
 	.opciones a:hover {
