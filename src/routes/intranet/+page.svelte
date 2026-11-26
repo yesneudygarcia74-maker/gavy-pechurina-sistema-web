@@ -1,4 +1,3 @@
-
 <script>
 	const modulos = [
 		{
@@ -16,18 +15,25 @@
 			numero: '02'
 		},
 		{
-			nombre: 'Asistencia',
-			descripcion: 'Controlar entradas y salidas del personal.',
-			icono: '🕒',
-			ruta: '/intranet/asistencia',
-			numero: '03'
-		},
-		{
 			nombre: 'Facturación',
-			descripcion: 'Consultar y gestionar las facturas.',
+			descripcion: 'Control de facturas y pedidos.',
 			icono: '🧾',
 			ruta: '/intranet/facturacion',
 			numero: '04'
+		},
+		{
+			nombre: 'Proveedores',
+			descripcion: 'Administrar proveedores, productos asignados y entregas.',
+			icono: '🚚',
+			ruta: '/intranet/proveedores',
+			numero: '05'
+		},
+		{
+			nombre: 'Entregas',
+			descripcion: 'Registrar y controlar las entregas de proveedores.',
+			icono: '📦',
+			ruta: '/intranet/proveedores/entregas',
+			numero: '06'
 		}
 	];
 </script>
@@ -97,7 +103,7 @@
 				<h2>Módulos del sistema</h2>
 				<p>Selecciona el área que deseas administrar.</p>
 			</div>
-			<span class="module-count">04 MÓDULOS</span>
+			<span class="module-count">05 MÓDULOS</span>
 		</section>
 
 		<div class="module-grid">
