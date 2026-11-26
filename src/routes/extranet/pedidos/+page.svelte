@@ -2,150 +2,71 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let productos = $state([]);
-	let carrito = $state([]);
-	let nombre = $state('');
-	let telefono = $state('');
-	let direccion = $state('');
-	let notas = $state('');
-	let mensaje = $state('');
-	let cargando = $state(false);
+	let entregas = $state([]);
+	let cargando = $state(true);
+	let error = $state('');
 
 	onMount(async () => {
-		const r = await fetch('/api/extranet/productos');
-		const d = await r.json();
-		if (r.ok) productos = d.productos || [];
-		else mensaje = d.error || 'No se pudieron cargar los productos.';
-	});
-
-	let total = $derived(
-		carrito.reduce((s, item) => s + Number(item.precio) * item.cantidad, 0)
-	);
-
-	function agregar(producto) {
-		const existente = carrito.find(i => i.producto_id === producto.id);
-		if (existente) {
-			carrito = carrito.map(i =>
-				i.producto_id === producto.id
-					? { ...i, cantidad: i.cantidad + 1 }
-					: i
-			);
-		} else {
-			carrito = [...carrito, {
-				producto_id: producto.id,
-				nombre: producto.nombre,
-				precio: producto.precio,
-				cantidad: 1
-			}];
-		}
-	}
-
-	function cambiarCantidad(id, cantidad) {
-		if (cantidad < 1) {
-			carrito = carrito.filter(i => i.producto_id !== id);
-		} else {
-			carrito = carrito.map(i =>
-				i.producto_id === id ? { ...i, cantidad } : i
-			);
-		}
-	}
-
-	async function realizarPedido() {
-		mensaje = '';
-
-		if (!nombre || !telefono || !direccion || carrito.length === 0) {
-			mensaje = 'Completa tus datos y agrega productos.';
-			return;
-		}
-
-		cargando = true;
-
 		try {
-			const respuesta = await fetch('/api/extranet/pedidos', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					nombre_cliente: nombre,
-					telefono,
-					direccion,
-					notas,
-					items: carrito.map(i => ({
-						producto_id: i.producto_id,
-						cantidad: i.cantidad
-					}))
-				})
-			});
-
+			const respuesta = await fetch('/api/extranet/pedidos');
 			const resultado = await respuesta.json();
 
 			if (!respuesta.ok) {
-				mensaje = resultado.error || 'No se pudo realizar el pedido.';
+				error = resultado.error || 'No se pudieron cargar las entregas.';
 				return;
 			}
 
-			carrito = [];
-			nombre = '';
-			telefono = '';
-			direccion = '';
-			notas = '';
-			mensaje = '¡Pedido realizado correctamente!';
+			entregas = resultado.entregas || [];
 		} catch {
-			mensaje = 'Error de conexión.';
+			error = 'Error de conexión.';
 		} finally {
 			cargando = false;
 		}
-	}
+	});
 </script>
 
 <svelte:head>
-	<title>Realizar pedido | Gavy Pechurina</title>
+	<title>Entregas asignadas | Gavy Pechurina</title>
 </svelte:head>
 
 <main>
-	<a href="/extranet">← Volver</a>
-	<h1>Realizar pedido</h1>
+	<a href="/extranet">← Volver al panel</a>
 
-	<h2>Productos disponibles</h2>
+	<h1>Entregas asignadas</h1>
+	<p class="descripcion">
+		Consulta las entregas que Gavy Pechurina te ha asignado.
+	</p>
 
-	<div class="catalogo">
-		{#each productos as producto (producto.id)}
-			<article>
-				<h3>{producto.nombre}</h3>
-				<p>{producto.descripcion || ''}</p>
-				<strong>RD$ {Number(producto.precio).toFixed(2)}</strong>
-				<button onclick={() => agregar(producto)}>Agregar</button>
-			</article>
-		{/each}
-	</div>
-
-	<h2>Mi pedido</h2>
-
-	{#each carrito as item (item.producto_id)}
-		<div class="item">
-			<span>{item.nombre} — RD$ {Number(item.precio).toFixed(2)}</span>
-			<input
-				type="number"
-				min="0"
-				max="50"
-				value={item.cantidad}
-				onchange={e => cambiarCantidad(item.producto_id, Number(e.currentTarget.value))}
-			/>
+	{#if cargando}
+		<p class="estado">Cargando entregas...</p>
+	{:else if error}
+		<p class="error">{error}</p>
+	{:else if entregas.length === 0}
+		<div class="vacio">
+			<span>🚚</span>
+			<h2>No tienes entregas asignadas</h2>
+			<p>Cuando el administrador te asigne una entrega, aparecerá aquí.</p>
 		</div>
-	{/each}
+	{:else}
+		<div class="lista">
+			{#each entregas as entrega (entrega.id)}
+				<article>
+					<div class="encabezado">
+						<h2>Entrega #{entrega.id}</h2>
+						<span class="estado-entrega">
+							{entrega.estado || 'Pendiente'}
+						</span>
+					</div>
 
-	<h3>Total: RD$ {total.toFixed(2)}</h3>
+					<p><strong>Fecha:</strong> {entrega.created_at
+						? new Date(entrega.created_at).toLocaleDateString('es-DO')
+						: 'No disponible'}</p>
 
-	<h2>Datos de entrega</h2>
-	<input placeholder="Nombre completo" bind:value={nombre} />
-	<input placeholder="Teléfono" bind:value={telefono} />
-	<input placeholder="Dirección de entrega" bind:value={direccion} />
-	<textarea placeholder="Notas del pedido (opcional)" bind:value={notas}></textarea>
-
-	<button class="enviar" onclick={realizarPedido} disabled={cargando}>
-		{cargando ? 'Enviando...' : 'Confirmar pedido'}
-	</button>
-
-	<p>{mensaje}</p>
+					<p><strong>Descripción:</strong> {entrega.descripcion || 'Sin descripción'}</p>
+				</article>
+			{/each}
+		</div>
+	{/if}
 </main>
 
 <style>
@@ -153,46 +74,77 @@
 		max-width: 1000px;
 		margin: auto;
 		padding: 30px 20px;
+		min-height: 100vh;
 		color: #333;
+		background: #fff5ec;
 	}
-	body { background: #fff5ec; }
-	a { color: #e87520; text-decoration: none; font-weight: bold; }
-	h1, h2 { color: #e87520; }
-	.catalogo {
+
+	a {
+		color: #e87520;
+		text-decoration: none;
+		font-weight: bold;
+	}
+
+	h1 {
+		color: #e87520;
+		margin-top: 25px;
+	}
+
+	.descripcion {
+		color: #777;
+	}
+
+	.lista {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 		gap: 18px;
+		margin-top: 25px;
 	}
-	article {
+
+	article, .vacio {
 		background: white;
-		padding: 20px;
+		padding: 22px;
 		border-radius: 12px;
 		box-shadow: 0 4px 15px #00000010;
 	}
-	article strong { display: block; margin: 12px 0; }
-	button {
-		background: #e87520;
-		color: white;
-		border: 0;
-		padding: 11px 15px;
-		border-radius: 7px;
-		cursor: pointer;
-	}
-	.item {
+
+	.encabezado {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		gap: 12px;
-		margin: 12px 0;
 	}
-	input, textarea {
-		display: block;
-		width: 100%;
-		box-sizing: border-box;
-		padding: 12px;
-		margin: 10px 0;
-		border: 1px solid #ddd;
-		border-radius: 7px;
+
+	.encabezado h2 {
+		color: #e87520;
 	}
-	.item input { width: 75px; }
-	.enviar { margin-top: 15px; }
+
+	.estado-entrega {
+		background: #fff0e3;
+		color: #e87520;
+		padding: 7px 12px;
+		border-radius: 20px;
+		font-size: 13px;
+	}
+
+	.estado {
+		text-align: center;
+		margin-top: 40px;
+	}
+
+	.error {
+		color: #c62828;
+	}
+
+	.vacio {
+		text-align: center;
+		margin-top: 35px;
+	}
+
+	.vacio span {
+		font-size: 40px;
+	}
+
+	.vacio h2 {
+		color: #e87520;
+	}
 </style>
