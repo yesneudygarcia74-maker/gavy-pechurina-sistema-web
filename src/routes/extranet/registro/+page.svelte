@@ -25,13 +25,14 @@
 			const resultado = await respuesta.json();
 
 			if (!respuesta.ok) {
-				error = resultado.error || 'No se pudo crear la cuenta.';
+				error = resultado.error || 'No se pudo registrar el proveedor.';
 				return;
 			}
 
-			mensaje = resultado.mensaje || 'Cuenta creada correctamente.';
+			mensaje = resultado.mensaje || 'Solicitud enviada correctamente.';
+
 			if (resultado.correcto) {
-				setTimeout(() => goto('/extranet/login'), 1500);
+				setTimeout(() => goto('/extranet/login'), 2500);
 			}
 		} catch {
 			error = 'Error de conexión.';
@@ -42,34 +43,42 @@
 </script>
 
 <svelte:head>
-	<title>Registro de clientes | Gavy Pechurina</title>
+	<title>Registro de proveedores | Gavy Pechurina</title>
 </svelte:head>
 
 <div class="pagina">
 	<form onsubmit={(e) => { e.preventDefault(); registrar(); }}>
 		<h1>Gavy Pechurina</h1>
-		<p>Crear cuenta de cliente</p>
+		<p>Registro de proveedor</p>
 
-		<label>Nombre completo</label>
-		<input bind:value={nombre} required placeholder="Tu nombre" />
+		<label>Nombre del proveedor</label>
+		<input bind:value={nombre} required placeholder="Nombre completo o empresa" />
 
 		<label>Correo electrónico</label>
-		<input type="email" bind:value={email} required placeholder="Tu correo" />
+		<input type="email" bind:value={email} required placeholder="Correo electrónico" />
 
 		<label>Teléfono</label>
-		<input bind:value={telefono} required placeholder="Tu teléfono" />
+		<input bind:value={telefono} required placeholder="Número de teléfono" />
 
 		<label>Contraseña</label>
-		<input type="password" bind:value={password} required minlength="6" placeholder="Mínimo 6 caracteres" />
+		<input
+			type="password"
+			bind:value={password}
+			required
+			minlength="6"
+			placeholder="Mínimo 6 caracteres"
+		/>
 
 		{#if error}<p class="error">{error}</p>{/if}
 		{#if mensaje}<p class="mensaje">{mensaje}</p>{/if}
 
 		<button type="submit" disabled={cargando}>
-			{cargando ? 'Registrando...' : 'Crear cuenta'}
+			{cargando ? 'Registrando...' : 'Solicitar registro'}
 		</button>
 
-		<p class="enlace">¿Ya tienes cuenta? <a href="/extranet/login">Inicia sesión</a></p>
+		<p class="enlace">
+			¿Ya tienes cuenta? <a href="/extranet/login">Inicia sesión</a>
+		</p>
 	</form>
 </div>
 
@@ -91,8 +100,15 @@
 		box-shadow: 0 8px 30px #00000012;
 	}
 
-	h1 { color: #e87520; text-align: center; }
-	form > p { text-align: center; color: #777; }
+	h1 {
+		color: #e87520;
+		text-align: center;
+	}
+
+	form > p {
+		text-align: center;
+		color: #777;
+	}
 
 	label {
 		display: block;
@@ -121,7 +137,21 @@
 		cursor: pointer;
 	}
 
-	.error { color: #c62828; }
-	.mensaje { color: #238447; }
-	a { color: #e87520; font-weight: bold; }
+	button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.error {
+		color: #c62828;
+	}
+
+	.mensaje {
+		color: #238447;
+	}
+
+	a {
+		color: #e87520;
+		font-weight: bold;
+	}
 </style>
