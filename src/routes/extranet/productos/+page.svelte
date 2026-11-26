@@ -26,14 +26,14 @@
 </script>
 
 <svelte:head>
-	<title>Productos | Gavy Pechurina</title>
+	<title>Productos suministrados | Gavy Pechurina</title>
 </svelte:head>
 
 <div class="pagina">
 	<header>
-		<a href="/extranet">← Volver</a>
-		<h1>Nuestros productos</h1>
-		<p>Calidad y sabor en cada pedido.</p>
+		<a href="/extranet">← Volver al panel</a>
+		<h1>Productos suministrados</h1>
+		<p>Consulta los productos relacionados con tus suministros a Gavy Pechurina.</p>
 	</header>
 
 	{#if cargando}
@@ -41,18 +41,20 @@
 	{:else if error}
 		<p class="error">{error}</p>
 	{:else if productos.length === 0}
-		<p class="estado">No hay productos disponibles.</p>
+		<div class="vacio">
+			<span>📦</span>
+			<h2>No hay productos registrados</h2>
+			<p>Todavía no tienes productos suministrados para consultar.</p>
+		</div>
 	{:else}
 		<div class="catalogo">
 			{#each productos as producto (producto.id)}
 				<article class="producto">
 					<span class="categoria">{producto.categoria || 'General'}</span>
 					<h2>{producto.nombre}</h2>
-					<p>{producto.descripcion || 'Delicioso producto de Gavy Pechurina.'}</p>
-
+					<p>{producto.descripcion || 'Sin descripción disponible.'}</p>
 					<div class="pie">
 						<strong>RD$ {Number(producto.precio).toFixed(2)}</strong>
-						<a href="/extranet/pedidos">Realizar pedido</a>
 					</div>
 				</article>
 			{/each}
@@ -82,6 +84,10 @@
 
 	h1 {
 		color: #e87520;
+	}
+
+	header p {
+		color: #777;
 	}
 
 	.catalogo {
@@ -115,24 +121,11 @@
 	}
 
 	.pie {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 10px;
 		margin-top: 20px;
 	}
 
 	.pie strong {
 		color: #e87520;
-	}
-
-	.pie a {
-		background: #e87520;
-		color: white;
-		padding: 10px;
-		border-radius: 7px;
-		text-decoration: none;
-		font-size: 13px;
 	}
 
 	.estado {
@@ -142,5 +135,26 @@
 	.error {
 		color: #c62828;
 		text-align: center;
+	}
+
+	.vacio {
+		background: white;
+		max-width: 500px;
+		margin: 50px auto;
+		padding: 35px;
+		border-radius: 14px;
+		text-align: center;
+	}
+
+	.vacio span {
+		font-size: 40px;
+	}
+
+	.vacio h2 {
+		color: #e87520;
+	}
+
+	.vacio p {
+		color: #777;
 	}
 </style>
